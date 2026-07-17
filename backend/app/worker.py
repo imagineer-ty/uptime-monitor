@@ -1,6 +1,6 @@
 import time
 
-from .database import SessionLocal
+from .database import SessionLocal, engine, Base
 from . import models
 from .monitor import check_website
 
@@ -34,4 +34,5 @@ def run_monitor():
 
 
 if __name__ == "__main__":
+    Base.metadata.create_all(bind=engine)	
     run_monitor()

@@ -2,14 +2,16 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from .monitor import check_website
-from .database import engine, SessionLocal
-from .database import Base
+from .database import engine, SessionLocal, Base
 from . import models
+from .monitor import check_website
+
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
-
-Base.metadata.create_all(bind=engine)
 
 
 def get_db():
@@ -46,17 +48,17 @@ def create_website(
 
     return new_website
 
+
 @app.get("/websites")
 def get_websites(db: Session = Depends(get_db)):
     websites = db.query(models.Website).all()
     return websites
 
+
 @app.get("/check")
-def check(url: str, db: Session = Depends(get_db)):
-	
-	result = check_website(url)
-	
-	return result
+def check(url: str):
+    return check_website(url)
+
 
 @app.get("/results")
 def get_results(db: Session = Depends(get_db)):
